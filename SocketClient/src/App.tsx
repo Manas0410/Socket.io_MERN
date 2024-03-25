@@ -1,10 +1,10 @@
 import axios from "axios";
 import "./App.css";
 import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import * as io from "socket.io-client";
 // import type { Socket } from "socket.io-client";
 
-const socket = io("http://localhost:8000/todo/data") as any;
+const socket = io.connect("http://127.0.0.1:8000");
 
 // Define a type for your todo items
 type Todo = {
@@ -15,6 +15,12 @@ type Todo = {
 function App() {
   const [todoVal, setTodoVal] = useState<string>("");
   const [todos, setTodos] = useState<Todo[]>([]); // Specify the type of state
+
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/todo/data")
+      .then((response) => setTodos(response.data));
+  }, []);
 
   useEffect(() => {
     socket.on("receive_message", () => {
@@ -29,6 +35,9 @@ function App() {
   };
   function addTodo() {
     let data = { id: todos.length + 1, work: todoVal };
+    setTodos((prev) => {
+      return [...prev, data];
+    });
     axios.post("http://127.0.0.1:8000/todo/data", data).then(() => {
       socket.emit("send_message", { message: "Hello from client" });
       setTodoVal("");

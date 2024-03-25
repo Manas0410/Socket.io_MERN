@@ -11,7 +11,7 @@ async function startTodoServer() {
 
     const io = new Server(server, {
       cors: {
-        origin: "http://localhost:5173",
+        origin: "*",
         credentials: true,
       },
     });
@@ -22,16 +22,18 @@ async function startTodoServer() {
         socket.broadcast.emit("receive_message", data);
       });
     });
+
     const port = 8000;
 
-    app.use(cors());
+    app.use(cors()); // Enable CORS for all routes
     app.use(express.json());
 
     app.get("/", (req, res) => {
       res.send({ message: "todo api" });
     });
     app.use("/todo", todoRoutes);
-    app.listen(port, () => {
+
+    server.listen(port, () => {
       console.log(`app is running on ${port} port`);
     });
   } catch (err) {
@@ -39,12 +41,3 @@ async function startTodoServer() {
   }
 }
 startTodoServer();
-// npx autocannon -c 4 -d 10 localhost:7001
-// const disableConsole = () => {
-//   if (process.env.NODE_ENV === "prod") {
-//     function resetLogs() {}
-//     console.log = resetLogs;
-//     console.warn = resetLogs;
-//     console.error = resetLogs;
-//   }
-// };
