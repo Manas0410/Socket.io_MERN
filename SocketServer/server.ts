@@ -3,6 +3,7 @@ import todoRoutes from "./routes";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
+import onchangeRouter from "./onchangeRoute";
 
 async function startTodoServer() {
   try {
@@ -32,6 +33,9 @@ async function startTodoServer() {
       res.send({ message: "todo api" });
     });
     app.use("/todo", todoRoutes);
+
+    // for inpur onchange
+    app.use("/onchange", onchangeRouter);
 
     server.listen(port, () => {
       console.log(`app is running on ${port} port`);
